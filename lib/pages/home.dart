@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:weather_app/services/weather.dart';
+import 'package:weather_app/widgets/app_text.dart';
+
 
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
@@ -23,6 +25,9 @@ class _HomeState extends State<Home> {
     String fontFamily = 'Nunito';
 
     return Scaffold(
+      // appBar: AppBar(
+      //  title: data['city'],
+      // ),
       backgroundColor: bgColor,
       body: SafeArea(
         child: Container(
@@ -38,11 +43,10 @@ class _HomeState extends State<Home> {
                 children: [
                   Row(
                     children: [
-                      Text(data['city'],
-                      style: TextStyle(
-                        color: fontColor,
-                        fontSize: 40.0,
-                          fontFamily: fontFamily)),
+                      AppText(
+                          text: data['city'],
+                          color: fontColor,
+                          size: 40.0),
                       Spacer(),
                       IconButton(
                           alignment: Alignment.bottomRight,
@@ -99,11 +103,10 @@ class _HomeState extends State<Home> {
                               color: fontColor))
                     ],
                   ),
-                  Text('last update time ${data['currentTime']}',
-                      style: TextStyle(
-                          color: fontColor,
-                          fontSize: 15.0,
-                          fontFamily: fontFamily),),
+                  AppText(
+                      text: 'last update time ${data['currentTime']}',
+                      color: fontColor,
+                      size: 15.0),
                 ],
               ),
               SizedBox(height: 150.0),
@@ -111,23 +114,14 @@ class _HomeState extends State<Home> {
                 children: [
                 Column(
                   children: [
-                      Text(data['temp'].toString(),
-                          style: TextStyle(
-                              color: fontColor,
-                              fontSize: 75.0,
-                              fontFamily: fontFamily)
-                      )
+                    AppText(text: data['temp'].toString(), color: fontColor, size: 75.0),
                     ],
                 ),
-                Column(
-                  children: [
-                    Text('℃',
-                      style: TextStyle(color: fontColor,
-                          fontSize: 35.0,
-                          fontFamily: fontFamily),),
-                    SizedBox(height: 30.0,)
-                  ],
-                ),
+                  Column(
+                    children: [
+                      AppText(text: '℃', color: fontColor, size: 35.0),
+                      SizedBox(height: 30.0,)
+                  ],),
                 Image.network('http://openweathermap.org/img/wn/${data['iconId']}@2x.png',fit: BoxFit.cover),
                 Column(
                   children: [
@@ -139,35 +133,19 @@ class _HomeState extends State<Home> {
                             Wrap(
                               children: [
                                 Icon(Icons.arrow_upward, color: Colors.white,  size: 18),
-                                Text('${data['tempMin']}℃',
-                                    style: TextStyle(
-                                        color: fontColor,
-                                        fontSize: 16.0,
-                                        fontFamily: fontFamily)
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
+                                AppText(text: '${data['tempMin']}℃', color: fontColor, size: 16.0),
+                              ],),
+                          ],),
                         SizedBox(width: 10.0),
                         Column(
                           children: [
                             Wrap(
                               children: [
                                 Icon(Icons.arrow_downward, color: Colors.white, size: 18),
-                                Text('${data['tempMin']}℃',
-                                    style: TextStyle(
-                                        color: fontColor,
-                                        fontSize: 16.0,
-                                        fontFamily: fontFamily)
-                                ),
-                              ],
-                            ),
-
-                          ],
-                        )
-                      ],
-                    ),
+                                AppText(text: '${data['tempMin']}℃', color: fontColor, size: 16.0),
+                              ],),
+                          ],)
+                      ],),
                     SizedBox(height: 5.0,),
                     Container(
                         height: 37,
@@ -181,10 +159,8 @@ class _HomeState extends State<Home> {
                           icon: Icon(Icons.umbrella,
                               size: 20.0
                               ,color: fontColor),
-                          label: Text('${data['humidity']}%',style: TextStyle(
-                              color: fontColor,
-                              fontSize: 18.0,
-                              fontFamily: fontFamily) ,)),
+                          label: AppText(text: '${data['humidity']}%', color: fontColor, size: 18.0),
+                        ),
                     ),
                     SizedBox(height: 5.0),
                     Container(
@@ -201,22 +177,15 @@ class _HomeState extends State<Home> {
                           icon: Icon(Icons.accessibility,
                               size: 18.0
                               ,color: fontColor),
-                          label: Text('${data['feelsLike']}ºC',style: TextStyle(
-                              color: fontColor,
-                              fontSize: 18.0,
-                              fontFamily: fontFamily) ,)),
+                          label: AppText(text: '${data['feelsLike']}ºC', color: fontColor, size: 18.0),
+                      ),
                     ),
                   ],),],
               ),
               Container(
                 alignment: Alignment.bottomLeft,
                 padding: EdgeInsets.only(left: 15.0),
-                child: Text(data['description'],
-                    style: TextStyle(
-                        color: fontColor,
-                        fontSize: 25.0,
-                        fontFamily: fontFamily,
-                    )),
+                child: AppText(text: data['description'], color: fontColor, size: 25.0),
               ),
               SizedBox(height: 30.0),
               Container(
@@ -232,32 +201,35 @@ class _HomeState extends State<Home> {
                     BorderRadius.all(Radius.circular(10))),
                 child: Column(
                   children: [
-                    Text('hourly weather', style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.w100
-                    ),textAlign: TextAlign.start),
+                    Text('hourly weather',
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18.0,
+                            fontWeight: FontWeight.w100),
+                        textAlign: TextAlign.start),
                     Container(
                       height: 125.0,
                       width: MediaQuery.of(context).size.width,
                       child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: data['weatherList'].length,
-                          itemBuilder: (BuildContext context, int index) {
-                            return Padding(
-                              padding: const EdgeInsets.fromLTRB(0, 10.0, 0, 10.0),
-                              child: Column(
-                                children: [
-                                  Text(data['weatherList'][index]['time']),
-                                  Image.network('http://openweathermap.org/img/wn/${data['weatherList'][index]['iconId']}@2x.png',
+                        scrollDirection: Axis.horizontal,
+                        itemCount: data['weatherList'].length,
+                        itemBuilder: (BuildContext context, int index) {
+                          return Padding(
+                            padding: const EdgeInsets.fromLTRB(0, 10.0, 0, 10.0),
+                            child: Column(
+                              children: [
+                                Text(data['weatherList'][index]['time']),
+                                Image.network(
+                                  'http://openweathermap.org/img/wn/${data['weatherList'][index]['iconId']}@2x.png',
                                   height: 60.0,
-                                  width: 60.0,),
-                                  Text('${data['weatherList'][index]['temp']}°C'),
-                                ],
-                              ),
-                            );
-                          },
-                    ),
+                                  width: 60.0,
+                                ),
+                                Text('${data['weatherList'][index]['temp']}°C'),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
                     ),
                   ],
                 ),
