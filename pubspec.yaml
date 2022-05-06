@@ -32,7 +32,9 @@ dependencies:
   http: ^0.13.4
   intl: ^0.17.0
   flutter_spinkit: ^5.1.0
-  # geolocator: ^8.2.0
+  shared_preferences: ^2.0.13
+  geolocator: ^8.2.0
+  animated_widgets: ^1.1.0
   # weather: ^2.0.1
 
   # The following adds the Cupertino Icons font to your application.
@@ -65,6 +67,7 @@ flutter:
   assets:
     - assets/
     - assets/flags/
+    - assets/icons/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:weather_app/services/weather.dart';
+import 'package:weather_app/widgets/app_text.dart';
+
 
 class ChooseLocation extends StatefulWidget {
   const ChooseLocation({Key? key}) : super(key: key);
@@ -11,6 +13,7 @@ class ChooseLocation extends StatefulWidget {
 class _ChooseLocationState extends State<ChooseLocation> {
 
   List<Weather> locations = [
+    Weather(lat: '', lon: '', city: 'Current position', flag: 'geolocation.png', currentPosition: true),
     Weather(lat: '50.45', lon: '30.52', city: 'Kiev', flag: 'ukraine.png'),
     Weather(lat: '51.50', lon: '-0.12', city: 'London', flag: 'uk.png'),
     Weather(lat: '37.98', lon: '23.72', city: 'Athens', flag: 'greece.png'),
@@ -37,7 +40,7 @@ class _ChooseLocationState extends State<ChooseLocation> {
       'tempMin': instance.tempMin,
       'humidity': instance.humidity,
       'iconId': instance.iconId,
-      //'windSpeed': result['windSpeed'],
+      'windSpeed': instance.windSpeed,
       'currentTime': instance.currentTime,
       'isDayTime': instance.isDayTime,
       'description': instance.description,
@@ -47,31 +50,38 @@ class _ChooseLocationState extends State<ChooseLocation> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.blueGrey[200],
-      appBar: AppBar(
-        backgroundColor: Colors.blueGrey,
-        title: Text('Chose city'),
-        centerTitle: true,
-      ),
-      body: ListView.builder(
-          itemCount: locations.length,
-          itemBuilder: (context, index) {
-            return Padding(
-              padding: const EdgeInsets.symmetric(vertical: 1.0, horizontal: 4.0),
-              child: Card(
-                child: ListTile(
-                  onTap: () {
-                    updateWeather(index);
-                  },
-                  title: Text(locations[index].city),
-                  leading: CircleAvatar(
-                    backgroundImage: AssetImage('assets/flags/${locations[index].flag}'),
+    return Container(
+      decoration: const BoxDecoration(
+          gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [Colors.blue, Colors.indigo])),
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: AppBar(
+          title: Text('Chose city'),
+          centerTitle: true,
+        ),
+        body: ListView.builder(
+            itemCount: locations.length,
+            itemBuilder: (context, index) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 1.0, horizontal: 4.0),
+                child: Card(
+                  color: Colors.transparent,
+                  child: ListTile(
+                    onTap: () {
+                      updateWeather(index);
+                    },
+                    title: AppText(text: locations[index].city),
+                    leading: CircleAvatar(
+                      backgroundImage: AssetImage('assets/flags/${locations[index].flag}'),
+                    ),
                   ),
                 ),
-              ),
-            );
-          }),
+              );
+            }),
+      ),
     );
   }
 }

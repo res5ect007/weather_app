@@ -1,6 +1,10 @@
+import 'package:animated_widgets/widgets/opacity_animated.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:weather_app/services/weather.dart';
 import 'package:weather_app/widgets/app_text.dart';
+import 'package:weather_app/widgets/weather_container.dart';
+import 'package:weather_app/widgets/weather_icons.dart';
 
 
 class Home extends StatefulWidget {
@@ -19,221 +23,196 @@ class _HomeState extends State<Home> {
 
     data = data.isNotEmpty ? data : ModalRoute.of(context)?.settings.arguments as Map;
 
-    Color? fontColor = Colors.white;
-    String bgImage = data['isDayTime'] ? 'day' : 'night';
-    Color? bgColor = data['isDayTime'] ? Colors.lightBlue[400] : Colors.indigo[800];
-    String fontFamily = 'Nunito';
+     Color? fontColor = Colors.white;
+    // String bgImage = data['isDayTime'] ? 'day' : 'night';
 
-    return Scaffold(
-      // appBar: AppBar(
-      //  title: data['city'],
-      // ),
-      backgroundColor: bgColor,
-      body: SafeArea(
-        child: Container(
-          decoration: BoxDecoration(
-            image: DecorationImage(
-                image: AssetImage('assets/$bgImage.png'), fit: BoxFit.cover),
+    return Container(
+      decoration: const BoxDecoration(
+          gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [Colors.blue, Colors.indigo])),
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: AppBar(
+          title: TextButton.icon(onPressed: () async {
+            dynamic result = await Navigator.pushNamed(context, '/location');
+            setState(() {
+              data = {
+                'city': result['city'],
+                'temp': result['temp'],
+                'feelsLike': result['feelsLike'],
+                'tempMax': result['tempMax'],
+                'tempMin': result['tempMin'],
+                'humidity': result['humidity'],
+                'iconId': result['iconId'],
+                'windSpeed': result['windSpeed'],
+                'currentTime': result['currentTime'],
+                'isDayTime': result['isDayTime'],
+                'description': result['description'],
+                'weatherList': result['weatherList'],
+                'weatherDayList': result['daysWeatherList']
+              };
+            });
+            final prefs = await SharedPreferences.getInstance();
+            await prefs.setString('city', result['city']);
+            await prefs.setString('lat', result['lat']);
+            await prefs.setString('lon', result['lon']);
+            await prefs.setString('flag', result['flag']);
+          },
+            icon: Icon(Icons.location_on, size: 25.0, color: fontColor),
+          label: Text(''),
           ),
-          child: Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: Column(children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
+        ),
+        endDrawer: Drawer(
+          backgroundColor: Colors.transparent,
+          child: ListView(
+            children: [
+              DrawerHeader(
+                  decoration: BoxDecoration(color: Colors.blue, ),
+                  child: Center(
+                      child:
                   Row(
                     children: [
-                      AppText(
-                          text: data['city'],
-                          color: fontColor,
-                          size: 40.0),
-                      Spacer(),
-                      IconButton(
-                          alignment: Alignment.bottomRight,
-                          onPressed: () async {
-                            dynamic result = await Navigator.pushNamed(context, '/location');
-                            setState(() {
-                              data = {
-                                'city': result['city'],
-                                'temp': result['temp'],
-                                'feelsLike': result['feelsLike'],
-                                'tempMax': result['tempMax'],
-                                'tempMin': result['tempMin'],
-                                'humidity': result['humidity'],
-                                'iconId': result['iconId'],
-                                //'windSpeed': result['windSpeed'],
-                                'currentTime': result['currentTime'],
-                                'isDayTime': result['isDayTime'],
-                                'description': result['description'],
-                                'weatherList': result['weatherList']
-                              };
-                            });
-                          },
-                          icon: Icon(
-                              Icons.location_on,
-                              size: 25.0,
-                              color: fontColor)),
-                      IconButton(
-                          alignment: Alignment.bottomRight,
-                          onPressed: () async {
+                      Container(
+                        height: 120,
+                        width: 120,
+                        child: CircleAvatar(
 
-                            Weather instance = Weather(city: 'Lviv', lat: '50.45', lon: '30.52', flag: 'ukraine.png');
-                            await instance.getWeather();
-
-                            setState(() {
-                              data = {
-                                'city': instance.city,
-                                'temp': instance.temp,
-                                'feelsLike': instance.feelsLike,
-                                'tempMax': instance.tempMax,
-                                'tempMin': instance.tempMin,
-                                'humidity': instance.humidity,
-                                'iconId': instance.iconId,
-                                //'windSpeed': instance.windSpeed,
-                                'currentTime': instance.currentTime,
-                                'isDayTime': instance.isDayTime,
-                                'description': instance.description,
-                                'weatherList': instance.hoursWeatherList
-                              };
-                            });
-                          },
-                          icon: Icon(
-                              Icons.update,
-                              size: 25.0,
-                              color: fontColor))
+                            child: Image(
+                                image: AssetImage('assets/icons/weather_app.png'))),
+                      ),
+                      Column(
+                        children: [
+                          AppText(text: 'Weather app',font: 'IndieFlower', size: 26,),
+                          AppText(text: 'ver. 1.1.0',font: 'IndieFlower', size: 26,),
+                        ],
+                      ),
                     ],
-                  ),
-                  AppText(
-                      text: 'last update time ${data['currentTime']}',
-                      color: fontColor,
-                      size: 15.0),
-                ],
+                  ))),
+              ListTile(shape: RoundedRectangleBorder(side: BorderSide(color: Colors.white, width: 1), borderRadius: BorderRadius.circular(10)),
+                focusColor: Colors.blueGrey,
+                style: ListTileStyle.list,
+                autofocus: true,
+                contentPadding: EdgeInsets.all(8.0),
+                textColor: Colors.white,
+                title: Text('Settings'),
+              )
+            ],
+          ),
+        ),
+        body: RefreshIndicator(
+          onRefresh: () async {
+            await Future.delayed(Duration(seconds: 1));
+
+            final prefs = await SharedPreferences.getInstance();
+            Weather instance = Weather(
+                city: prefs.getString('city') as String,
+                lat: prefs.getString('lat') as String,
+                lon: prefs.getString('lon') as String,
+                flag: prefs.getString('flag') as String);
+
+            await instance.getWeather();
+            setState(() {
+              data = {
+                'city': instance.city,
+                'temp': instance.temp,
+                'feelsLike': instance.feelsLike,
+                'tempMax': instance.tempMax,
+                'tempMin': instance.tempMin,
+                'humidity': instance.humidity,
+                'iconId': instance.iconId,
+                'windSpeed': instance.windSpeed,
+                'currentTime': instance.currentTime,
+                'isDayTime': instance.isDayTime,
+                'description': instance.description,
+                'weatherList': instance.hoursWeatherList,
+                'weatherDayList': instance.daysWeatherList,
+              };
+          });
+            },
+          child: Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: ListView(children: [
+              AppText(text: data['city'], color: fontColor, size: 30.0,),
+              Align(
+                alignment: Alignment.bottomLeft,
+                child: AppText(
+                    text: 'last update time ${data['currentTime']}',
+                    color: fontColor,
+                    size: 15.0),
               ),
-              SizedBox(height: 150.0),
+              SizedBox(height: 20.0),
               Row(
                 children: [
-                Column(
-                  children: [
-                    AppText(text: data['temp'].toString(), color: fontColor, size: 75.0),
-                    ],
-                ),
+                AppText(text: data['temp'].toString(), color: fontColor, size: 85.0),
                   Column(
                     children: [
-                      AppText(text: '℃', color: fontColor, size: 35.0),
+                      AppText(text: '℃', color: fontColor, size: 40.0),
                       SizedBox(height: 30.0,)
                   ],),
-                Image.network('http://openweathermap.org/img/wn/${data['iconId']}@2x.png',fit: BoxFit.cover),
-                Column(
-                  children: [
-                    SizedBox(height: 25.0,),
-                    Row(
-                      children: [
-                        Column(
-                          children: [
-                            Wrap(
-                              children: [
-                                Icon(Icons.arrow_upward, color: Colors.white,  size: 18),
-                                AppText(text: '${data['tempMin']}℃', color: fontColor, size: 16.0),
-                              ],),
-                          ],),
-                        SizedBox(width: 10.0),
-                        Column(
-                          children: [
-                            Wrap(
-                              children: [
-                                Icon(Icons.arrow_downward, color: Colors.white, size: 18),
-                                AppText(text: '${data['tempMin']}℃', color: fontColor, size: 16.0),
-                              ],),
-                          ],)
-                      ],),
-                    SizedBox(height: 5.0,),
-                    Container(
-                        height: 37,
-                        width: 110.0,
-                        decoration: BoxDecoration(
-                          color: Colors.grey.withOpacity(0.25),
-                            border: Border.all(
-                              color: Colors.grey.withOpacity(0.25)),
-                            borderRadius: BorderRadius.all(Radius.circular(20))),
-                        child: TextButton.icon(onPressed: () {},
-                          icon: Icon(Icons.umbrella,
-                              size: 20.0
-                              ,color: fontColor),
-                          label: AppText(text: '${data['humidity']}%', color: fontColor, size: 18.0),
-                        ),
-                    ),
-                    SizedBox(height: 5.0),
-                    Container(
-                      height: 37,
-                      width: 110.0,
-                      decoration: BoxDecoration(
-                          color: Colors.grey.withOpacity(0.3),
-                          border: Border.all(
-                            color: Colors.grey.withOpacity(0.3),
-                          ),
-                          borderRadius:
-                          BorderRadius.all(Radius.circular(20))),
-                      child: TextButton.icon(onPressed: () {},
-                          icon: Icon(Icons.accessibility,
-                              size: 18.0
-                              ,color: fontColor),
-                          label: AppText(text: '${data['feelsLike']}ºC', color: fontColor, size: 18.0),
-                      ),
-                    ),
-                  ],),],
-              ),
-              Container(
-                alignment: Alignment.bottomLeft,
-                padding: EdgeInsets.only(left: 15.0),
-                child: AppText(text: data['description'], color: fontColor, size: 25.0),
-              ),
-              SizedBox(height: 30.0),
-              Container(
-                alignment: Alignment.bottomLeft,
-                height: 150,
-                width: MediaQuery.of(context).size.width,
-                decoration: BoxDecoration(
-                    color: Colors.grey.withOpacity(0.3),
-                    border: Border.all(
-                      color: Colors.grey.withOpacity(0.3),
-                    ),
-                    borderRadius:
-                    BorderRadius.all(Radius.circular(10))),
-                child: Column(
-                  children: [
-                    Text('hourly weather',
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 18.0,
-                            fontWeight: FontWeight.w100),
-                        textAlign: TextAlign.start),
-                    Container(
-                      height: 125.0,
-                      width: MediaQuery.of(context).size.width,
-                      child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: data['weatherList'].length,
-                        itemBuilder: (BuildContext context, int index) {
-                          return Padding(
-                            padding: const EdgeInsets.fromLTRB(0, 10.0, 0, 10.0),
-                            child: Column(
-                              children: [
-                                Text(data['weatherList'][index]['time']),
-                                Image.network(
-                                  'http://openweathermap.org/img/wn/${data['weatherList'][index]['iconId']}@2x.png',
-                                  height: 60.0,
-                                  width: 60.0,
-                                ),
-                                Text('${data['weatherList'][index]['temp']}°C'),
-                              ],
-                            ),
-                          );
-                        },
-                      ),
-                    ),
+                Spacer(),
+                  OpacityAnimatedWidget.tween(
+                      duration: Duration(milliseconds: 1500),
+                      child: WeatherIcon(iconId: data['iconId'], isDayTime: data['isDayTime'], height: 160, width: 160,))
                   ],
+              ),
+              Container(
+                alignment: Alignment.bottomLeft,
+                padding: EdgeInsets.only(left: 10.0),
+                child: AppText(text: data['description'], color: fontColor, size: 30.0),
+              ),
+              //SizedBox(height: 25.0,),
+              Container(
+              alignment: Alignment.bottomRight,
+              child:
+              Container(
+                height: 37,
+                width: 110.0,
+                decoration: BoxDecoration(
+                    color: Colors.grey.withOpacity(0.25),
+                    border: Border.all(
+                        color: Colors.grey.withOpacity(0.25)),
+                    borderRadius: BorderRadius.all(Radius.circular(20))),
+                child: TextButton.icon(onPressed: () {},
+                  icon: Icon(Icons.umbrella,
+                      size: 20.0
+                      ,color: fontColor),
+                  label: AppText(text: '${data['humidity']}%', color: fontColor, size: 18.0),
                 ),
-              )
+              ),),
+              SizedBox(height: 5.0,),
+              Row(
+                children: [
+                  Image.asset('assets/icons/temp_max.png',scale: 22,),
+                  AppText(text: '${data['tempMin']}℃', color: fontColor, size: 19.0),
+                  SizedBox(width: 10.0),
+                  Image.asset('assets/icons/temp_min.png',scale: 22,),
+                  AppText(text: '${data['tempMin']}℃', color: fontColor, size: 19.0),
+                  Spacer(),
+                  Container(
+                    height: 37,
+                    width: 110.0,
+                    decoration: BoxDecoration(
+                        color: Colors.grey.withOpacity(0.3),
+                        border: Border.all(
+                          color: Colors.grey.withOpacity(0.3),
+                        ),
+                        borderRadius:
+                        BorderRadius.all(Radius.circular(20))),
+                    child: TextButton.icon(onPressed: () {},
+                      icon: Icon(Icons.accessibility,
+                          size: 18.0
+                          ,color: fontColor),
+                      label: AppText(text: '${data['feelsLike']}ºC', color: fontColor, size: 18.0),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 40.0),
+              WeatherContainer(data: data['weatherList'], titleText: 'HOURLY WEATHER', isDayTime: data['isDayTime']),
+              SizedBox(height: 20.0),
+              WeatherContainer(data: data['weatherDayList'], titleText: 'DAYS WEATHER', isDayTime: data['isDayTime']),
             ]),
           ),
         ),
