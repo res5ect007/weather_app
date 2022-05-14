@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:weather_app/services/weather.dart';
 import 'package:weather_app/widgets/app_text.dart';
-
+import 'package:sizer/sizer.dart';
 
 class ChooseLocation extends StatefulWidget {
   const ChooseLocation({Key? key}) : super(key: key);
@@ -44,7 +44,8 @@ class _ChooseLocationState extends State<ChooseLocation> {
       'currentTime': instance.currentTime,
       'isDayTime': instance.isDayTime,
       'description': instance.description,
-      'weatherList': instance.hoursWeatherList
+      'weatherList': instance.hoursWeatherList,
+      'daysWeatherList': instance.daysWeatherList
     });
   }
 
@@ -59,21 +60,21 @@ class _ChooseLocationState extends State<ChooseLocation> {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: AppBar(
-          title: Text('Chose city'),
+          title: const Text('Chose city'),
           centerTitle: true,
         ),
         body: ListView.builder(
             itemCount: locations.length,
             itemBuilder: (context, index) {
               return Padding(
-                padding: const EdgeInsets.symmetric(vertical: 1.0, horizontal: 4.0),
+                padding: EdgeInsets.symmetric(vertical: 0.2.h, horizontal: 1.w),
                 child: Card(
                   color: Colors.transparent,
                   child: ListTile(
                     onTap: () {
                       updateWeather(index);
                     },
-                    title: AppText(text: locations[index].city),
+                    title: AppText(text: locations[index].city, size: 15.0,),
                     leading: CircleAvatar(
                       backgroundImage: AssetImage('assets/flags/${locations[index].flag}'),
                     ),

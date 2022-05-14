@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sizer/sizer.dart';
 
 class AppText extends StatelessWidget {
   double size;
@@ -6,14 +7,14 @@ class AppText extends StatelessWidget {
   Color color;
   String font;
 
-  AppText({required this.text, this.color = Colors.white, this.size = 18.0, this.font = 'Nunito'});
+  AppText({required this.text, this.color = Colors.white, this.size = 12.0, this.font = 'Nunito'});
 
   @override
   Widget build(BuildContext context) {
     return Text(text,
         style: TextStyle(
             color: color,
-            fontSize: size,
+            fontSize: size.sp,
             fontFamily: font));
   }
 }

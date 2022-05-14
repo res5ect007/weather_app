@@ -1,7 +1,7 @@
 import 'dart:convert';
-import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart';
 import 'package:intl/intl.dart';
+import 'package:location/location.dart';
 import 'package:weather_app/services/geolocation.dart';
 
 class Weather {
@@ -34,8 +34,8 @@ class Weather {
     try {
 
       if (currentPosition) {
-        Location location = Location();
-        Position position =  await location.determinePosition();
+        Geolocation location = Geolocation();
+        LocationData position =  await location.determinePosition();
         lat = position.latitude.toString();
         lon = position.longitude.toString();
       }
@@ -105,7 +105,7 @@ class Weather {
       print('ok2');
 
     } catch (e) {
-      print('sorry, error');
+      print('Error: ${e.toString()}');
     }
   }
 }
