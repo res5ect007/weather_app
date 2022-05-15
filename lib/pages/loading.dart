@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:animated_widgets/widgets/opacity_animated.dart';
 import 'package:flutter/material.dart';
 import 'package:weather_app/services/weather.dart';
+import 'package:sizer/sizer.dart';
 
 class Loading extends StatefulWidget {
   const Loading({Key? key}) : super(key: key);
@@ -17,7 +18,7 @@ class _LoadingState extends State<Loading>  {
     Weather instance = Weather(lat: '', lon: '', city: 'Current position', flag: 'geolocation.png', currentPosition: true);
     await instance.getWeather();
 
-    Timer(const Duration(milliseconds: 800), () {
+    Timer(const Duration(milliseconds: 400), () {
       Navigator.pushReplacementNamed(context, '/home', arguments: {
         'city': instance.city,
         'temp': instance.temp,
@@ -53,18 +54,18 @@ class _LoadingState extends State<Loading>  {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: Padding(
-          padding: const EdgeInsets.fromLTRB(0, 200, 0, 0),
+          padding: EdgeInsets.fromLTRB(0, 25.h, 0, 0),
           child: Center(
             child: Column(
               children: [
-                const Text('Weather app',
+                Text('Weather app',
                   style: TextStyle(
-                      fontSize: 50,
+                      fontSize: 50.sp,
                       letterSpacing: 2.0,
                       color: Colors.white,
                       fontFamily: 'IndieFlower'),
                 ),
-                const SizedBox(height: 40),
+                SizedBox(height: 5.h),
                 OpacityAnimatedWidget.tween(
                     duration: const Duration(milliseconds: 900),
                     child: const Image(image: AssetImage('assets/icons/weather_app.png'),height: 300, width: 300,)),

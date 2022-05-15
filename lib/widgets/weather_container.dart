@@ -7,16 +7,14 @@ class WeatherContainer extends StatelessWidget {
   final String titleText;
   final List data;
   final bool isDayTime;
-  final double paddingHeight = 0.9.h;
-  final double paddingWidth = 2.6.w;
 
-  WeatherContainer({Key? key, required this.data, required this.titleText, required this.isDayTime}) : super(key: key);
+  const WeatherContainer({Key? key, required this.data, required this.titleText, required this.isDayTime}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Container(
       alignment: Alignment.bottomLeft,
-      height: 140,
+      height: 18.h,
       width: MediaQuery.of(context).size.width,
       decoration: BoxDecoration(
           color: Colors.grey.withOpacity(0.3),
@@ -37,14 +35,14 @@ class WeatherContainer extends StatelessWidget {
             ),
           ),
           SizedBox(
-            height: 100.0,
+            height: 13.h,
             width: MediaQuery.of(context).size.width,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
               itemCount: data.length,
               itemBuilder: (BuildContext context, int index) {
                 return Padding(
-                  padding: EdgeInsets.fromLTRB(paddingWidth, paddingHeight, paddingWidth, 0),
+                  padding: EdgeInsets.fromLTRB(2.6.w, 0.9.h, 2.6.w, 0),
                   child: Column(
                     children: [
                       AppText(

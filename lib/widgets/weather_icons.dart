@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 
 class WeatherIcon extends StatelessWidget {
@@ -8,7 +7,7 @@ class WeatherIcon extends StatelessWidget {
   final double width;
   final bool isDayTime;
 
-  WeatherIcon({required this.iconId, required this.isDayTime, this.height = 30, this.width = 30});
+  const WeatherIcon({Key? key, required this.iconId, required this.isDayTime, this.height = 30, this.width = 30}): super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -71,6 +70,6 @@ class WeatherIcon extends StatelessWidget {
     }
     else{
       return const Image(image: AssetImage('assets/icons/star.png'));
-    };
+    }
   }
 }
