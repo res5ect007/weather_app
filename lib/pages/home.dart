@@ -37,6 +37,7 @@ class _HomeState extends State<Home>  {
   @override
   Widget build(BuildContext context) {
 
+
     data = data.isNotEmpty ? data : ModalRoute.of(context)?.settings.arguments as Map;
     _language = context.watch<LanguageModel>().language;
 
