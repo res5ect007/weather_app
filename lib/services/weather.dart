@@ -4,6 +4,8 @@ import 'package:intl/intl.dart';
 import 'package:location/location.dart';
 import 'package:weather_app/services/geolocation.dart';
 
+import '../localization.dart';
+
 class Weather {
   final String apiKey = '85810a93c46f0c45b6a19f56f9dcb2ad';
   String units = 'metric';
@@ -26,30 +28,32 @@ class Weather {
   String flag;
   bool currentPosition;
 
+  Weather(
+      {required this.city,
+      required this.lat,
+      required this.lon,
+      required this.flag,
+      this.currentPosition = false});
 
-  Weather({required this.city, required this.lat, required this.lon, required this.flag, this.currentPosition = false});
+   Future getWeather(lang) async {
 
-  Future<void> getWeather() async {
-    print('ok1');
     try {
-
       if (currentPosition) {
         Geolocation location = Geolocation();
-        LocationData position =  await location.determinePosition();
+        LocationData position = await location.determinePosition();
         lat = position.latitude.toString();
         lon = position.longitude.toString();
       }
 
       //make the request for hours
       Response response = await get(Uri.parse(
-          'https://api.openweathermap.org/data/2.5/forecast?lat=$lat&lon=$lon&cnt=10&units=$units&appid=$apiKey'));
+          'https://api.openweathermap.org/data/2.5/forecast?lat=$lat&lon=$lon&cnt=10&units=$units&appid=$apiKey&lang=$lang'));
       Map data = jsonDecode(response.body);
 
       Response dayResponse = await get(Uri.parse(
-          'https://api.openweathermap.org/data/2.5/onecall?lat=$lat&lon=$lon&exclude=hourly&units=$units&appid=$apiKey'));
+          'https://api.openweathermap.org/data/2.5/onecall?lat=$lat&lon=$lon&exclude=hourly&units=$units&appid=$apiKey&lang=$lang'));
       Map daysData = jsonDecode(dayResponse.body);
 
-      //get properties
       city = data['city']['name'];
       temp = daysData['current']['temp'];
       feelsLike = daysData['current']['feels_like'];
@@ -61,7 +65,8 @@ class Weather {
       windSpeed = daysData['current']['wind_speed'];
       description = daysData['current']['weather'][0]['description'];
 
-      String capitalize(String name) => '${name[0].toUpperCase()}${name.substring(1)}';
+      String capitalize(String name) =>
+          '${name[0].toUpperCase()}${name.substring(1)}';
       description = capitalize(description);
 
       // set time property
@@ -69,22 +74,22 @@ class Weather {
       currentTime = DateFormat.Hm().format(now);
       isDayTime = now.hour > 6 && now.hour < 19 ? true : false;
 
-      for (int i = 0; i < data['list'].length; i++){
-
-        DateTime hoursTime = DateTime.fromMillisecondsSinceEpoch(data['list'][i]['dt'] * 1000);
+      for (int i = 0; i < data['list'].length; i++) {
+        DateTime hoursTime =
+            DateTime.fromMillisecondsSinceEpoch(data['list'][i]['dt'] * 1000);
         dynamic hoursTemp = data['list'][i]['main']['temp'];
 
         var listValue = {
-            'time': DateFormat.Hm().format(hoursTime),
-            'temp': hoursTemp.round(),
-            'iconId': data['list'][i]['weather'][0]['id'],
-          };
+          'time': DateFormat.Hm().format(hoursTime),
+          'temp': hoursTemp.round(),
+          'iconId': data['list'][i]['weather'][0]['id'],
+        };
         hoursWeatherList.add(listValue);
       }
 
-      for (int i = 0; i < daysData['daily'].length; i++){
-
-        DateTime daysTime = DateTime.fromMillisecondsSinceEpoch(daysData['daily'][i]['dt'] * 1000);
+      for (int i = 0; i < daysData['daily'].length; i++) {
+        DateTime daysTime = DateTime.fromMillisecondsSinceEpoch(
+            daysData['daily'][i]['dt'] * 1000);
         dynamic daysTemp = daysData['daily'][i]['temp']['day'];
 
         if (i == 0) {
@@ -95,17 +100,15 @@ class Weather {
         }
 
         var listValue = {
-          'time': i == 0 ? 'Today' : DateFormat.MMMd().format(daysTime),
+          'time': i == 0 ? KeepLocalization(locale: lang).today : DateFormat.MMMd().format(daysTime),
           'temp': daysTemp.round(),
           'iconId': daysData['daily'][i]['weather'][0]['id'],
         };
         daysWeatherList.add(listValue);
       }
 
-      print('ok2');
-
     } catch (e) {
-      print('Error: ${e.toString()}');
+      print('My Error: ${e.toString()}');
     }
   }
 }

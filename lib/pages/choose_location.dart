@@ -2,6 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:weather_app/services/weather.dart';
 import 'package:weather_app/widgets/app_text.dart';
 import 'package:sizer/sizer.dart';
+import 'package:provider/provider.dart';
+import 'package:weather_app/services/theme_styles.dart';
+import '../localization.dart';
+import '../services/language_model.dart';
+import '../services/theme_model.dart';
 
 class ChooseLocation extends StatefulWidget {
   const ChooseLocation({Key? key}) : super(key: key);
@@ -11,6 +16,9 @@ class ChooseLocation extends StatefulWidget {
 }
 
 class _ChooseLocationState extends State<ChooseLocation> {
+
+  final ThemeStyle themeStyle = ThemeStyle();
+  String _language = 'en';
 
   List<Weather> locations = [
     Weather(lat: '', lon: '', city: 'Current position', flag: 'geolocation.png', currentPosition: true),
@@ -27,7 +35,7 @@ class _ChooseLocationState extends State<ChooseLocation> {
   void updateWeather(index) async {
 
     Weather instance = locations[index];
-    await instance.getWeather();
+    await instance.getWeather(_language);
 
     Navigator.pop(context, {
       'lat': instance.lat,
@@ -51,38 +59,53 @@ class _ChooseLocationState extends State<ChooseLocation> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-          gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [Colors.blue, Colors.indigo])),
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        appBar: AppBar(
-          title: const Text('Chose city'),
-          centerTitle: true,
+
+    _language = context.watch<LanguageModel>().language;
+
+    return Consumer<ThemeModel>(
+        builder: (context, ThemeModel themeNotifier, child) {
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      body: Container(
+        decoration: themeStyle.getBackground(themeNotifier.isDark),
+        child: SafeArea(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+            padding: EdgeInsets.fromLTRB(5.w, 2.h, 0, 2.w),
+            child: AppText(text: KeepLocalization(locale: _language).locations, size: 20.sp)
+          ),
+              Expanded(
+                flex: 1,
+                child: ListView.separated(
+                  padding: const EdgeInsets.all(8),
+                  scrollDirection: Axis.vertical,
+                    itemCount: locations.length,
+                    itemBuilder: (context, index) {
+                      return
+                        ListTile(
+                              onTap: () {
+                                updateWeather(index);
+                              },
+                              title: AppText(text: locations[index].city, size: 12.sp,),
+                              leading: CircleAvatar(
+                                backgroundImage: AssetImage('assets/flags/${locations[index].flag}'),
+                              ),
+                        );
+                    }, separatorBuilder: (BuildContext context, int index) => const Divider(),),
+              ),
+            ],
+          ),
         ),
-        body: ListView.builder(
-            itemCount: locations.length,
-            itemBuilder: (context, index) {
-              return Padding(
-                padding: EdgeInsets.symmetric(vertical: 0.2.h, horizontal: 1.w),
-                child: Card(
-                  color: Colors.transparent,
-                  child: ListTile(
-                    onTap: () {
-                      updateWeather(index);
-                    },
-                    title: AppText(text: locations[index].city, size: 15.0,),
-                    leading: CircleAvatar(
-                      backgroundImage: AssetImage('assets/flags/${locations[index].flag}'),
-                    ),
-                  ),
-                ),
-              );
-            }),
       ),
-    );
+      floatingActionButton:
+      FloatingActionButton(onPressed: () {  },
+        backgroundColor: themeStyle.getFloatingActionButtonColor(themeNotifier.isDark),
+            child: const Icon(Icons.add)),
+      );
+    });
   }
 }
+
+

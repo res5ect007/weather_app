@@ -4,7 +4,7 @@ import 'package:sizer/sizer.dart';
 import 'app_text.dart';
 
 class WeatherContainer extends StatelessWidget {
-  final String titleText;
+  final String? titleText;
   final List data;
   final bool isDayTime;
 
@@ -29,7 +29,7 @@ class WeatherContainer extends StatelessWidget {
             child: Align(
               alignment: Alignment.bottomLeft,
               child: Text(
-                titleText,
+                titleText!,
                 style: const TextStyle(color: Colors.white70),
               ),
             ),
